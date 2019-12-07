@@ -1,32 +1,50 @@
 """
 main.py
 """
-# pip install cmake
-# pip install dlib
-# install VS2019
-# import dlib
-# from skimage import io
+import os
+import time
+import glob
 import cv2
 
-# 顔検出
-# def face_detect(file_name):
-#     face_detector = dlib.get_frontal_face_detector()
-#     image = io.imread(file_name)
-#     detected_faces = face_detector(image, 1)
+# face detect
+def face_detect(file_name):
+    #open image
+    image = cv2.imread(file_name)
 
-#     save_image = cv2.imread(file_name, cv2.IMREAD_COLOR)
+    #gray scale convert
+    image_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    # cv2.imshow("test", image_gray)
+    # cv2.waitKey(0)
 
-#     for i, face_rect in enumerate(detected_faces):
-#         cv2.rectangle(save_image, tuple([face_rect.left(),face_rect.top()]), tuple([face_rect.right(),face_rect.bottom()]), (0, 0,255), thickness=2)
-#         cv2.imwrite('complete_'+file_name, save_image)
+    #features extraction
+    cascade_path = "./model/haarcascade_frontalface_default.xml"
+    assert os.path.isfile(cascade_path), 'haarcascade_frontalface_default.xml not exists'
+    cascade = cv2.CascadeClassifier(cascade_path)
+
+    #face detect
+    facerect = cascade.detectMultiScale(image_gray, scaleFactor=1.1, minNeighbors=2, minSize=(30, 30))
+
+    if len(facerect) > 0:
+        #rect = (x, y, w, h)
+        max_wxh = 0 
+        for rect in facerect:
+            # color = (255, 255, 255)
+            # cv2.rectangle(image, tuple(rect[0:2]),tuple(rect[0:2]+rect[2:4]), color, thickness=2)
+            # cv2.imshow("test", image)
+
+            if(max_wxh < rect[2] * rect[3]):
+                max_rect = rect
+            
+        return (max_rect[1], max_rect[1] + max_rect[3], max_rect[0], max_rect[0] + max_rect[2])
+    return (0, 0, 0, 0)
 
 # 顔切り出し
 def cut_face(file_name, cut_rect):
     """cut_face
-
         cut_rect = [top, bottom, left, right]
     """
-    output_file = "out.jpg"
+    output_file = str(os.path.splitext(file_name)[0]) + "_face.jpg"
+    # print("output : " + output_file)
     img = cv2.imread(file_name)
     img1 = img[cut_rect[0] : cut_rect[1], cut_rect[2] : cut_rect[3]]
     cv2.imwrite(output_file, img1)
@@ -42,12 +60,14 @@ def feature_extraction():
 if __name__ == "__main__":
     print("begin")
 
-    INPUT_FILE = "image/001_Charles/440px-Prince_Charles_Ireland-4.jpg"
-    print(INPUT_FILE)
+    INPUT_PATH = "." + os.sep + "data" + os.sep
+    input_list = glob.glob(INPUT_PATH + "*" + os.sep + "*.jpg")
+    print(input_list)
 
-    # face_detect()
+    for input_file in input_list:
+        rect = face_detect(input_file)
+        # print("rect : " + str(rect))
 
-    rect = [0, 50, 0, 50]
-    cut_face(INPUT_FILE, rect)
+        cut_face(input_file, rect)
 
     print("end")

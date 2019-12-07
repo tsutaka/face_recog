@@ -104,4 +104,6 @@ ENV/
 *.txt
 *.jpg
 *.mp4
-image/*
+out.jpg
+data/*
+model/*
