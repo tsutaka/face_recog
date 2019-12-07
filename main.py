@@ -3,6 +3,7 @@ main.py
 """
 import os
 import time
+from pathlib import Path
 import glob
 import cv2
 
@@ -12,9 +13,9 @@ def face_detect(file_name):
     image = cv2.imread(file_name)
 
     #gray scale convert
+    #Don't use "_" as the first character of filename
+    #Don't use multi byte character as the filename 
     image_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    # cv2.imshow("test", image_gray)
-    # cv2.waitKey(0)
 
     #features extraction
     cascade_path = "./model/haarcascade_frontalface_default.xml"
@@ -28,10 +29,6 @@ def face_detect(file_name):
         #rect = (x, y, w, h)
         max_wxh = 0 
         for rect in facerect:
-            # color = (255, 255, 255)
-            # cv2.rectangle(image, tuple(rect[0:2]),tuple(rect[0:2]+rect[2:4]), color, thickness=2)
-            # cv2.imshow("test", image)
-
             if(max_wxh < rect[2] * rect[3]):
                 max_rect = rect
             
@@ -43,8 +40,11 @@ def cut_face(file_name, cut_rect):
     """cut_face
         cut_rect = [top, bottom, left, right]
     """
-    output_file = str(os.path.splitext(file_name)[0]) + "_face.jpg"
-    # print("output : " + output_file)
+    output_file = "." + os.sep + "work" + os.sep + "face" + os.sep
+    temp_path = Path(file_name)
+    output_file += (temp_path.parts)[1] + ".jpg"
+
+    print("output : " + output_file)
     img = cv2.imread(file_name)
     img1 = img[cut_rect[0] : cut_rect[1], cut_rect[2] : cut_rect[3]]
     cv2.imwrite(output_file, img1)
@@ -62,7 +62,6 @@ if __name__ == "__main__":
 
     INPUT_PATH = "." + os.sep + "data" + os.sep
     input_list = glob.glob(INPUT_PATH + "*" + os.sep + "*.jpg")
-    print(input_list)
 
     for input_file in input_list:
         rect = face_detect(input_file)
