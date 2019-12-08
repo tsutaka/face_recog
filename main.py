@@ -70,3 +70,4 @@ if __name__ == "__main__":
         cut_face(input_file, rect)
 
     print("end")
+

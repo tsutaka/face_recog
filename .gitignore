@@ -107,3 +107,5 @@ ENV/
 out.jpg
 data/*
 model/*
+facenet/data/images/*
+facenet/data/images_dataset/*
