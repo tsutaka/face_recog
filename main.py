@@ -49,14 +49,6 @@ def cut_face(file_name, cut_rect):
     img1 = img[cut_rect[0] : cut_rect[1], cut_rect[2] : cut_rect[3]]
     cv2.imwrite(output_file, img1)
 
-# 顔特徴量抽出
-def feature_extraction():
-    pass
-
-# 顔検出
-# 顔認識
-
-
 if __name__ == "__main__":
     print("begin")
 
